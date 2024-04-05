@@ -15,7 +15,7 @@ public class ArticleClient implements IArticleClient {
     private ApArticleService apArticleService;
     @Override
     @PostMapping("/api/v1/article/save")
-    public ResponseResult searchArticle(ArticleDto dto) {
+    public ResponseResult saveArticle(ArticleDto dto) {
         return apArticleService.saveArticle(dto);
     }
 }
