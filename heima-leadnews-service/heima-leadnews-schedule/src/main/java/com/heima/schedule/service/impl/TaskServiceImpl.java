@@ -1,6 +1,7 @@
 package com.heima.schedule.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.heima.common.constants.ScheduleConstants;
 import com.heima.common.redis.CacheService;
 import com.heima.model.schedule.dtos.Task;
@@ -17,8 +18,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -201,5 +204,39 @@ public class TaskServiceImpl implements TaskService {
                 }
             }
         }
+    }
+
+    /**
+     * 数据库任务同步到redis中
+     */
+    @PostConstruct
+    @Scheduled(cron = "0 */5 * * * ?")
+    public void reloadData(){
+        //清除缓存中的数据  list zset
+        clearCache();
+        //查询数据库符合条件的数据
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, 5);
+
+        List<Taskinfo> taskinfoList = taskinfoMapper.selectList(Wrappers.<Taskinfo>lambdaQuery().lt(Taskinfo::getExecuteTime, calendar.getTime()));
+        //把数据存入redis
+        if (taskinfoList != null && !taskinfoList.isEmpty()){
+            for (Taskinfo taskinfo : taskinfoList) {
+                Task task = new Task();
+                BeanUtils.copyProperties(taskinfo, task);
+                task.setExecuteTime(taskinfo.getExecuteTime().getTime());
+                saveTaskToCache(task);
+            }
+        }
+        log.info("数据库同步到redis");
+    }
+
+    private void clearCache() {
+        //获取数据的key
+        Set<String> topicKeys = cacheService.scan(ScheduleConstants.TOPIC + "*");
+        Set<String> futureKeys = cacheService.scan(ScheduleConstants.FUTURE + "*");
+        //删除数据
+        cacheService.delete(topicKeys);
+        cacheService.delete(futureKeys);
     }
 }

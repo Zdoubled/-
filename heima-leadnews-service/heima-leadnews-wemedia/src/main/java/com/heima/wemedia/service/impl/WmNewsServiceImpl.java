@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.heima.common.constants.WemediaConstants;
+import com.heima.common.constants.WmNewsMessageConstants;
 import com.heima.common.exception.CustomException;
 import com.heima.model.common.dtos.PageResponseResult;
 import com.heima.model.common.dtos.ResponseResult;
@@ -22,17 +23,16 @@ import com.heima.wemedia.mapper.WmNewsMapper;
 import com.heima.wemedia.mapper.WmNewsMaterialMapper;
 import com.heima.wemedia.service.WmNewsAutoScanService;
 import com.heima.wemedia.service.WmNewsService;
+import com.heima.wemedia.service.WmNewsTaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,9 +42,12 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
 
     @Autowired
     private WmNewsMaterialMapper wmNewsMaterialMapper;
-
     @Autowired
     private WmMaterialMapper wmMaterialMapper;
+    @Autowired
+    private WmNewsTaskService wmNewsTaskService;
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
     /**
      * 查询文章
      * @param dto
@@ -119,8 +122,45 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
         saveRelationInfoForCover(dto, wmNews, materials);
 
         //6.审核文章
-        wmNewsAutoScanService.autoScanWmNews(wmNews.getId());
+        //wmNewsAutoScanService.autoScanWmNews(wmNews.getId());
+        wmNewsTaskService.addNewsToTask(wmNews.getId(), wmNews.getPublishTime());
 
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    }
+
+    /**
+     * 文章上下架
+     * @param dto
+     * @return
+     */
+    @Override
+    public ResponseResult downOrUp(WmNewsDto dto) {
+        //1.判断文章是否存在
+        Integer id = dto.getId();
+        if (id == null) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID);
+        }
+        WmNews wmNews = getById(id);
+        if (wmNews == null) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.DATA_NOT_EXIST, "文章不存在");
+        }
+        //2.判断文章状态是否为已上架
+        if (!wmNews.getStatus().equals(WmNews.Status.PUBLISHED.getCode())) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID, "文章已下架");
+        }
+        //3.判断dto参数是否合法
+        if (dto.getEnable() != null && dto.getEnable() > -1 && dto.getEnable() < 2) {
+            //4.修改文章上下架状态
+            update(Wrappers.<WmNews>lambdaUpdate().set(WmNews::getEnable, dto.getEnable()).eq(WmNews::getId, id));
+        }
+        //5.发送消息，通知article修改文章配置
+        if (wmNews.getArticleId() != null) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("articleId", wmNews.getArticleId());
+            map.put("enable", dto.getEnable());
+            kafkaTemplate.send(WmNewsMessageConstants.WM_NEWS_UP_OR_DOWN_TOPIC, JSON.toJSONString(map));
+        }
+        //6.返回
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
 
