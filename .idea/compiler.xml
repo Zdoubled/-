@@ -17,9 +17,11 @@
         <module name="heima-leadnews-user" />
         <module name="heima-leadnews-article" />
         <module name="kafka-demo" />
+        <module name="es-init" />
         <module name="heima-leadnews-schedule" />
         <module name="heima-leadnews-utils" />
         <module name="heima-leadnews-app-gateway" />
+        <module name="heima-leadnews-search" />
         <module name="heima-leadnews-common" />
         <module name="heima-leadnews-model" />
       </profile>
@@ -30,6 +32,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="es-init" options="-parameters" />
       <module name="freemarker-demo" options="-parameters" />
       <module name="heima-file-starter" options="-parameters" />
       <module name="heima-leadnews" options="-parameters" />
@@ -42,6 +45,7 @@
       <module name="heima-leadnews-gateway" options="-parameters" />
       <module name="heima-leadnews-model" options="-parameters" />
       <module name="heima-leadnews-schedule" options="-parameters" />
+      <module name="heima-leadnews-search" options="-parameters" />
       <module name="heima-leadnews-service" options="-parameters" />
       <module name="heima-leadnews-test" options="-parameters" />
       <module name="heima-leadnews-user" options="-parameters" />
