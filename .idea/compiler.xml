@@ -23,6 +23,7 @@
         <module name="heima-leadnews-app-gateway" />
         <module name="heima-leadnews-search" />
         <module name="heima-leadnews-common" />
+        <module name="mongo-demo" />
         <module name="heima-leadnews-model" />
       </profile>
     </annotationProcessing>
@@ -54,6 +55,7 @@
       <module name="heima-leadnews-wemedia-gateway" options="-parameters" />
       <module name="kafka-demo" options="-parameters" />
       <module name="minio-demo" options="-parameters" />
+      <module name="mongo-demo" options="-parameters" />
       <module name="tess4j-demp" options="-parameters" />
     </option>
   </component>
