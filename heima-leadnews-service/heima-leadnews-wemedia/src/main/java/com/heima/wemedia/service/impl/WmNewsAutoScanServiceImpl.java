@@ -123,7 +123,7 @@ public class WmNewsAutoScanServiceImpl implements WmNewsAutoScanService {
     @Autowired
     private WmUserMapper wmUserMapper;
 
-    private ResponseResult saveAppArticle(WmNews wmNews) {
+    public ResponseResult saveAppArticle(WmNews wmNews) {
         ArticleDto dto = new ArticleDto();
         //属性拷贝
         BeanUtils.copyProperties(wmNews, dto);
