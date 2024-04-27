@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableDiscoveryClient
 @MapperScan("com.heima.article.mapper")
 @EnableAsync
+@EnableFeignClients(basePackages = "com.heima.apis")
 public class ArticleApplication {
 
     public static void main(String[] args) {
