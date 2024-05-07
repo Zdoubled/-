@@ -4,10 +4,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.heima.model.article.dtos.ArticleDto;
 import com.heima.model.article.dtos.ArticleHomeDto;
 import com.heima.model.article.dtos.ArticleInfoDto;
+import com.heima.model.mess.ArticleVisitStreamMess;
 import com.heima.model.article.pojos.ApArticle;
 import com.heima.model.common.dtos.ResponseResult;
-
-import java.io.IOException;
 
 public interface ApArticleService extends IService<ApArticle> {
 
@@ -18,6 +17,14 @@ public interface ApArticleService extends IService<ApArticle> {
      * @return
      */
     ResponseResult load(Short loadtype, ArticleHomeDto dto);
+
+    /**
+     * 根据参数加载文章列表
+     * @param loadtype 是否为首页
+     * @param dto
+     * @return
+     */
+    ResponseResult load2(Short loadtype, ArticleHomeDto dto, Boolean firstPage);
 
     /**
      * 保存app端相关文章
@@ -32,4 +39,10 @@ public interface ApArticleService extends IService<ApArticle> {
      * @return
      */
     ResponseResult loadArticleBehavior(ArticleInfoDto dto);
+
+    /**
+     * 更新文章的分值  同时更新缓存中的热点文章数据
+     * @param mess
+     */
+    public void updateScore(ArticleVisitStreamMess mess);
 }

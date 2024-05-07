@@ -1594,7 +1594,7 @@ DYNAMIC</Options>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
     <column id="401" parent="322" name="id">
-      <AutoIncrement>1383828014629179394</AutoIncrement>
+      <AutoIncrement>1782675882591260675</AutoIncrement>
       <DasType>bigint unsigned|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -1725,7 +1725,7 @@ DYNAMIC</Options>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
     <column id="425" parent="323" name="id">
-      <AutoIncrement>1383828014645956610</AutoIncrement>
+      <AutoIncrement>1782675882591260676</AutoIncrement>
       <Comment>主键</Comment>
       <DasType>bigint unsigned|0s</DasType>
       <NotNull>1</NotNull>
@@ -1771,7 +1771,7 @@ DYNAMIC</Options>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
     <column id="434" parent="324" name="id">
-      <AutoIncrement>1383828014650150915</AutoIncrement>
+      <AutoIncrement>1782675882591260676</AutoIncrement>
       <Comment>主键</Comment>
       <DasType>bigint unsigned|0s</DasType>
       <NotNull>1</NotNull>
@@ -1802,7 +1802,7 @@ DYNAMIC</Options>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
     <column id="440" parent="325" name="id">
-      <AutoIncrement>5</AutoIncrement>
+      <AutoIncrement>4</AutoIncrement>
       <Comment>主键</Comment>
       <DasType>int unsigned|0s</DasType>
       <NotNull>1</NotNull>
@@ -1856,7 +1856,7 @@ name</ColNames>
       <UnderlyingIndexName>idx_type_name</UnderlyingIndexName>
     </key>
     <column id="450" parent="326" name="id">
-      <AutoIncrement>2</AutoIncrement>
+      <AutoIncrement>1</AutoIncrement>
       <DasType>bigint unsigned|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>

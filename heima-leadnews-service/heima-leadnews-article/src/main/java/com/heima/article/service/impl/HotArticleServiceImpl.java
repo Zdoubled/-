@@ -10,10 +10,12 @@ import com.heima.model.article.pojos.ApArticle;
 import com.heima.model.article.vos.HotArticleVO;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.wemedia.pojos.WmChannel;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.Date;
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 import static com.heima.common.constants.ArticleConstants.*;
 
 @Service
+@Transactional
+@Slf4j
 public class HotArticleServiceImpl implements HotArticleService {
     @Autowired
     private ApArticleMapper apArticleMapper;
@@ -40,7 +44,6 @@ public class HotArticleServiceImpl implements HotArticleService {
         List<HotArticleVO> hotArticleVOS = computeHotArticle(apArticleList);
         //3.为每个频道缓存30条文章到redis中
         cacheTagToRedis(hotArticleVOS);
-        //4.
     }
 
     private void cacheTagToRedis(List<HotArticleVO> hotArticleVOS) {

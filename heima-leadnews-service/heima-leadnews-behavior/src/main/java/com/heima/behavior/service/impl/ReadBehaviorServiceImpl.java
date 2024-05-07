@@ -4,12 +4,15 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.heima.behavior.service.ReadBehaviorService;
 import com.heima.common.constants.BehaviorConstants;
+import com.heima.common.constants.HotArticleConstants;
 import com.heima.common.redis.CacheService;
 import com.heima.model.behavior.dtos.ArticleReadDto;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
+import com.heima.model.mess.UpdateArticleMess;
 import com.heima.model.user.pojos.ApUser;
 import com.heima.utils.thread.AppThreadLocalUtil;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,8 @@ public class ReadBehaviorServiceImpl implements ReadBehaviorService {
 
     @Autowired
     private CacheService cacheService;
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     @Override
     public ResponseResult readBehavior(ArticleReadDto dto) {
@@ -40,7 +45,12 @@ public class ReadBehaviorServiceImpl implements ReadBehaviorService {
         }
         //没有，则创建
         cacheService.hPut(BehaviorConstants.READ_BEHAVIOR + dto.getArticleId(), user.getId().toString(), JSON.toJSONString(dto));
-        //4.TODO: 发送信息，数据聚合
+        //4.发送信息，数据聚合
+        UpdateArticleMess updateArticleMess = new UpdateArticleMess();
+        updateArticleMess.setArticleId(dto.getArticleId());
+        updateArticleMess.setType(UpdateArticleMess.UpdateArticleType.VIEWS);
+        updateArticleMess.setAdd(1);
+        kafkaTemplate.send(HotArticleConstants.HOT_ARTICLE_SCORE_TOPIC, JSON.toJSONString(updateArticleMess));
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
 }
